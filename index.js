@@ -24,7 +24,7 @@ cloudinary.config({
 
 
 
-//Import routes
+//IMPORT ROUTES
 
 const userRoutes = require("./routes/user-route");
 app.use(userRoutes);
