@@ -2,14 +2,19 @@ const express = require("express");
 const { findOne } = require("../models/user-model");
 const router = express.Router();
 const isAuthenticated = require("../middleware/isAuthentificated");
-const cloudinary = require("cloudinary");
 const User = require("../models/user-model");
 const Offer = require("../models/offer-model");
 const { query } = require("express");
 
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 
-//PUBLISH 
+//PUBLISH OFFERS
 
 router.post("/offer/publish", isAuthenticated, async(req, res) => {
     try {
@@ -53,6 +58,7 @@ router.post("/offer/publish", isAuthenticated, async(req, res) => {
 
     }
 })
+
 
 //FILTERS
 router.get("/offers", async(req, res) => {
@@ -131,6 +137,78 @@ router.get("/offer/:id", async(req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+//MODIFY OFFERS
+router.put("/offer/modify/:id"), isAuthenticated, async(req, res) => {
+
+        const offerToModify = await Offer.findById(req.params.id);
+        try {
+            if (req.fields.title) {
+                offerToModify.product_name = req.fields.title;
+            }
+            if (req.fields.description) {
+                offerToModify.product_description = req.fields.description;
+            }
+            if (req.fields.price) {
+                offerToModify.product_price = req.fields.price;
+            }
+            const offerDetails = offerToModify.product_details;
+            for (let i = 0; offerDetails.length; i++) {
+                if (offerDetails[i].MARQUE) {
+                    if (req.fields.brand) {
+                        offerDetails[i].MARQUE = req.fields.brand;
+                    }
+                }
+                if (offerDetails[i].TAILLE) {
+                    if (req.fields.size) {
+                        offerDetails[i].TAILLE = req.fields.size;
+                    }
+                }
+                if (details[i].ÉTAT) {
+                    if (req.fields.condition) {
+                        details[i].ÉTAT = req.fields.condition;
+                    }
+                }
+                if (details[i].COULEUR) {
+                    if (req.fields.color) {
+                        details[i].COULEUR = req.fields.color;
+                    }
+                }
+                if (details[i].EMPLACEMENT) {
+                    if (req.fields.location) {
+                        details[i].EMPLACEMENT = req.fields.location;
+                    }
+                }
+            }
+            offerToModify.markModified("product_details");
+            if (req.files.picture) {
+                const result = await cloudinary.uploader.upload(req.files.picture.path, {
+                    public_id: `/vinted/offers/$offerToModify._id}/preview`,
+
+                });
+                offerToModify.product_image = result;
+            }
+            await offerToModify.save();
+            res.status(200).json("Offer has been successfully modified !");
+
+        } catch (error) {
+            res.status(400).json({ message: error.message })
+        }
+    }
+    //DELETE OFFER 
+
+router.delete("/offer/delete/:id"), isAuthenticated, async(req, res) => {
+    try {
+        await cloudinary.api.delete_resources_by_prefix(
+            `/vinted-offers/${req.params.id}`);
+        await cloudinary.api.delete_folder(`/vinted-offers/${req.params.id}`);
+        offerToDelete = await Offer.findById(req.params.id);
+        await offerToDelete.delete();
+        res.status(200).json("Your offer has been successfully deleted !")
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
 
 
 module.exports = router;

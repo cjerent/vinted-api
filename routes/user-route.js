@@ -5,9 +5,9 @@ const router = express.Router();
 //IMPORT CLOUDINARY
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
-    cloud_name: "racoon",
-    api_key: "115348264884395",
-    api_secret: "tNyKD7kj7cvbakgxUZo06Pl3-HI"
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 //HASH+SALT
