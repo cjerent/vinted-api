@@ -1,9 +1,10 @@
 const User = require("../models/user-model");
 const isAuthenticated = async(req, res, next) => {
     if (req.headers.authorization) {
+        const token = req.headers.authorization.replace("Bearer ", "");
         const user = await User.findOne({
-            token: req.headers.authorization.replace("Bearer ", "")
-        });
+            token: token
+        }).select("account _id");
         if (user) {
             req.user = user;
             return next();

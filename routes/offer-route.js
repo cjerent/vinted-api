@@ -142,6 +142,7 @@ router.get("/offer/:id", async(req, res) => {
 router.put("/offer/modify/:id", isAuthenticated, async(req, res) => {
 
         const offerToModify = await Offer.findById(req.params.id);
+
         try {
             if (req.fields.title) {
                 offerToModify.product_name = req.fields.title;
@@ -153,7 +154,7 @@ router.put("/offer/modify/:id", isAuthenticated, async(req, res) => {
                 offerToModify.product_price = req.fields.price;
             }
             const offerDetails = offerToModify.product_details;
-            for (let i = 0; offerDetails.length; i++) {
+            for (i = 0; i < offerDetails.length; i++) {
                 if (offerDetails[i].MARQUE) {
                     if (req.fields.brand) {
                         offerDetails[i].MARQUE = req.fields.brand;
@@ -179,11 +180,11 @@ router.put("/offer/modify/:id", isAuthenticated, async(req, res) => {
                         offerDetails[i].EMPLACEMENT = req.fields.location;
                     }
                 }
-            }
+            };
             offerToModify.markModified("product_details");
             if (req.files.picture) {
                 const result = await cloudinary.uploader.upload(req.files.picture.path, {
-                    public_id: `/vinted/offers/$offerToModify._id}/preview`,
+                    public_id: `vinted/offers/${offerToModify._id}/preview`,
 
                 });
                 offerToModify.product_image = result;
@@ -197,18 +198,18 @@ router.put("/offer/modify/:id", isAuthenticated, async(req, res) => {
     })
     //DELETE OFFER 
 
-router.delete("/offer/delete/:id"), isAuthenticated, async(req, res) => {
+router.delete("/offer/delete/:id", isAuthenticated, async(req, res) => {
     try {
         await cloudinary.api.delete_resources_by_prefix(
-            `/vinted-offers/${req.params.id}`);
-        await cloudinary.api.delete_folder(`/vinted-offers/${req.params.id}`);
+            `vinted/offers/${req.params.id}`);
+        await cloudinary.api.delete_folder(`vinted/offers/${req.params.id}`);
         offerToDelete = await Offer.findById(req.params.id);
         await offerToDelete.delete();
         res.status(200).json("Your offer has been successfully deleted !")
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
-}
+});
 
 
 module.exports = router;
