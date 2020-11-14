@@ -36,8 +36,8 @@ router.post("/offer/publish", isAuthenticated, async(req, res) => {
 
         })
         const productImage = await cloudinary.uploader.upload(pictureToUpload, {
-            folder: "/vinted/offers",
-            public_id: req.fields.title,
+            folder: `/vinted/offers/${newOffer._id}`,
+            public_id: "preview",
         });
         newOffer.product_image = productImage,
 
@@ -139,7 +139,7 @@ router.get("/offer/:id", async(req, res) => {
 });
 
 //MODIFY OFFERS
-router.put("/offer/modify/:id"), isAuthenticated, async(req, res) => {
+router.put("/offer/modify/:id", isAuthenticated, async(req, res) => {
 
         const offerToModify = await Offer.findById(req.params.id);
         try {
@@ -164,19 +164,19 @@ router.put("/offer/modify/:id"), isAuthenticated, async(req, res) => {
                         offerDetails[i].TAILLE = req.fields.size;
                     }
                 }
-                if (details[i].ÉTAT) {
+                if (offerDetails[i].ETAT) {
                     if (req.fields.condition) {
-                        details[i].ÉTAT = req.fields.condition;
+                        offerDetails[i].ETAT = req.fields.condition;
                     }
                 }
-                if (details[i].COULEUR) {
+                if (offerDetails[i].COULEUR) {
                     if (req.fields.color) {
-                        details[i].COULEUR = req.fields.color;
+                        offerDetails[i].COULEUR = req.fields.color;
                     }
                 }
-                if (details[i].EMPLACEMENT) {
+                if (offerDetails[i].EMPLACEMENT) {
                     if (req.fields.location) {
-                        details[i].EMPLACEMENT = req.fields.location;
+                        offerDetails[i].EMPLACEMENT = req.fields.location;
                     }
                 }
             }
@@ -194,7 +194,7 @@ router.put("/offer/modify/:id"), isAuthenticated, async(req, res) => {
         } catch (error) {
             res.status(400).json({ message: error.message })
         }
-    }
+    })
     //DELETE OFFER 
 
 router.delete("/offer/delete/:id"), isAuthenticated, async(req, res) => {
