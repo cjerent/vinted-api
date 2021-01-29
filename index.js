@@ -29,6 +29,10 @@ const offerRoutes = require("./routes/offer-route");
 app.use(userRoutes);
 app.use(offerRoutes);
 
+app.get("/", (req, res) => {
+  res.json("Bienvenue sur l'API de Vinted");
+});
+
 app.listen(process.env.PORT, () => {
   console.log("Server started");
 });
