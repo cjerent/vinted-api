@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { findOne } = require("../models/user-model");
 const router = express.Router();
 const isAuthenticated = require("../middleware/isAuthentificated");
@@ -12,6 +13,7 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+app.use(cors());
 
 //PUBLISH OFFERS
 
